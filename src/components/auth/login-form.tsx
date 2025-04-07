@@ -3,6 +3,7 @@ import * as z from "zod"
 import { CardWrapper } from "./card-wrapper"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useSearchParams } from "next/navigation"
 import { LoginSchema } from "../../../schema" 
 import {
  Form,
@@ -21,9 +22,15 @@ import { login } from "../../../action/login"
 import { useState, useTransition } from "react"
 
 export const  LoginForm = () =>{
+
+    const searchParams = useSearchParams();
+    const urlError = searchParams.get("error") === "OAuthAccountNotLinked" ? "email already in use with differnt provider": ""
+
+
     const [ ispending , startTransition] = useTransition()
     const [error , SetError] = useState<string | undefined>("");
     const [success , SetSucess] = useState<string |undefined>("");
+
 
     type FormData = z.infer<typeof LoginSchema> 
     const form = useForm<FormData>({
@@ -34,14 +41,16 @@ export const  LoginForm = () =>{
         }
     })
 
+
     const onSubmit = (values : FormData) =>{
     startTransition(()=>{
         login(values).then((data)=>{
-            SetError(data.error);
-            SetSucess(data.sucsess);
+            SetError(data?.error);
+            //add success when we add 2FA
 
         })
     })
+
      
     }
     return (
@@ -91,13 +100,13 @@ export const  LoginForm = () =>{
                  )}
                />
             </div>
-            <FormError message={error}/>
+            <FormError message={error || urlError}/>
             <FormSuccess message={success} />
             <Button type="submit"
             className="w-full"
             disabled={ispending}
             >
-            Create a account   
+           Log In  
             </Button>
 
           </form>
