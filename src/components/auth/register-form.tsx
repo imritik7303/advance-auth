@@ -37,7 +37,7 @@ export const  RegisterForm = () =>{
 
     const onSubmit = (values : FormData) =>{
     startTransition(()=>{
-        register (values).then((data)=>{
+        register(values).then((data)=>{
             SetError(data.error);
             SetSucess(data.sucsess);
 
@@ -81,7 +81,7 @@ export const  RegisterForm = () =>{
                     <FormControl>
                         <Input
                         {...field}
-                        placeholder="Adarshyadav@gamil.com"
+                        placeholder="Adarshyadav@gmail.com"
                         type="email"
                         disabled={ispending}
                         />
