@@ -3,7 +3,8 @@ import * as z from "zod"
 import { CardWrapper } from "./card-wrapper"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { RegisterSchema } from "../../../schema" 
+
+import { NewPasswordSchema } from "../../../schema" 
 import {
  Form,
  FormControl,
@@ -17,81 +18,57 @@ import { Button } from "../ui/button"
 import { FormError } from "../form-error"
 import { FormSuccess } from "../form-sucess"
 
-import { register } from "../../../action/register"
+ 
 import { useState, useTransition } from "react"
+import Link from "next/link"
+import {  newPassword} from "../../../action/new-password"
+import { useSearchParams } from "next/navigation"
 
-export const  RegisterForm = () =>{
+export const  NewPassordForm = () =>{
+
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+
+
     const [ ispending , startTransition] = useTransition()
     const [error , SetError] = useState<string | undefined>("");
     const [success , SetSucess] = useState<string |undefined>("");
 
-    type FormData = z.infer<typeof RegisterSchema> 
+
+    type FormData = z.infer<typeof NewPasswordSchema> 
     const form = useForm<FormData>({
-        resolver : zodResolver(RegisterSchema),
+        resolver : zodResolver(NewPasswordSchema),
         defaultValues : {
-            email: "",
-            password : "",
-            name : "", 
+            password: "",    
         }
     })
 
-    const onSubmit = (values : FormData) =>{
-        SetSucess("")
-        SetError("")    
-        startTransition(()=>{
-        register(values).then((data)=>{
-            SetError(data.error);
-            SetSucess(data.sucsess);
 
+    const onSubmit = (values : FormData ) =>{
+    startTransition(()=>{
+        SetSucess("")
+        SetError("")
+        newPassword(values,token).
+        then((data) =>{
+          SetSucess(data?.success)
+          SetError(data?.error)
         })
+
+        
     })
+
      
     }
     return (
         <CardWrapper
-        headerLabel="create a account"
-        backButtonLabel="Already have an account?"
+        headerLabel="Enter a new password"
+        backButtonLabel="Back to login"
         backButtonHref="/auth/login" 
-        showSocial    
+           
            >
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-4">
-            <FormField
-               control={form.control}
-               name="name"
-               render={({field}) =>(
-                <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                        <Input
-                        {...field}
-                        placeholder="sovit singh"
-                        disabled={ispending}
-                        />
-                    </FormControl>
-                    <FormMessage/>
-                </FormItem>
-                 )}
-               />
-               <FormField
-               control={form.control}
-               name="email"
-               render={({field}) =>(
-                <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                        <Input
-                        {...field}
-                        placeholder="Adarshyadav@gmail.com"
-                        type="email"
-                        disabled={ispending}
-                        />
-                    </FormControl>
-                    <FormMessage/>
-                </FormItem>
-                 )}
-               />
                <FormField
                control={form.control}
                name="password"
@@ -101,7 +78,7 @@ export const  RegisterForm = () =>{
                     <FormControl>
                         <Input
                         {...field}
-                        placeholder="*******"
+                        placeholder="******"
                         type="password"
                         disabled={ispending}
                         />
@@ -110,6 +87,7 @@ export const  RegisterForm = () =>{
                 </FormItem>
                  )}
                />
+               
             </div>
             <FormError message={error}/>
             <FormSuccess message={success} />
@@ -117,7 +95,7 @@ export const  RegisterForm = () =>{
             className="w-full"
             disabled={ispending}
             >
-            Register
+            Reset Password 
             </Button>
 
           </form>

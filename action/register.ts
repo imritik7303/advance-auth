@@ -3,8 +3,9 @@ import * as z from "zod"
 import bcyrpt from "bcrypt"
 import { RegisterSchema } from "../schema"
 import { db } from "@/lib/db"
-import { error } from "console"
+import {generateVerificationToken} from "@/lib/token"
 import { getUserByEmail } from "../data/user"
+import { sendVerificationEmail } from "@/lib/mail"
 
 type Data = z.infer<typeof RegisterSchema>
 
@@ -30,7 +31,10 @@ export const register  = async(values : Data) =>{
             password:hashedPassword , 
         }
     });
-
+   const verficationToken = await generateVerificationToken(email)
     //send a verification token email
-    return {sucsess : "email sent"}
+    await sendVerificationEmail(verficationToken.email,verficationToken.token)
+    return {sucsess : "Confiramation email sent"}
+
+    
 }

@@ -3,6 +3,7 @@ import authConfig from "./auth.config"
 import {PrismaAdapter} from "@auth/prisma-adapter"
 import {db} from "@/lib/db"
 import { getUserById } from "../../data/user"
+import { getTwoFactorConfirmationByUserId} from "../../data/two-factor-confirmation"
 import { UserRole } from "@prisma/client"
 export const { handlers:{GET ,POST},  auth  ,signIn ,signOut} = NextAuth({
 pages:{
@@ -18,6 +19,31 @@ async linkAccount({user}){
 } 
 },
  callbacks :{
+  async signIn({user , account}){
+  //allow OAuth provider without email
+  if(account?.provider !== "credentials") return true
+  if(!user.id) return false
+  const existingUser = await getUserById(user.id)
+
+  //pevent sign without email verfifcation
+  if(!existingUser?.emailVerified ) return false
+
+  //2Fa
+  if(existingUser.isTwoFactorEnabled){
+    const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id)
+
+    if(!twoFactorConfirmation) return false;
+
+    //delete 2Fa for next sign in
+
+    await db.twoFactorConfirmation.delete({
+      where :{id : twoFactorConfirmation.id}
+    })
+
+  }
+
+  return true
+  },
   //session does not have the id by default so we need to extrect it from the token.sub  
   async session({token ,session }){
     if(token.sub && session.user){
