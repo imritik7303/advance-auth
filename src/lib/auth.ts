@@ -52,6 +52,10 @@ async linkAccount({user}){
     if(token.role && session.user){
       session.user.role = token.role as UserRole
     }
+    if(token && session.user){
+      session.user.role = token.role as UserRole
+    }
+
     return session
   },
      async jwt({token}) {
@@ -60,6 +64,7 @@ async linkAccount({user}){
       const existingUser = await getUserById(token.sub)
       if(!existingUser) return token
       token.role = existingUser.role
+      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled
       return token
      }
  },

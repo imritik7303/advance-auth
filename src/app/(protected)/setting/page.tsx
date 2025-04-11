@@ -1,11 +1,9 @@
 "use client"
 
-
-
 import { logout } from '../../../../action/signout';
 import { useCurrentUser } from '../../../../hooks/use-current-user';
 
-const settingPage = async () => {
+const settingPage = () => {
   
   const user = useCurrentUser();
 
