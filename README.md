@@ -14,13 +14,17 @@ pnpm dev
 bun dev
 ```
 craete a .env file and add these to your file
+
 DATABASE_URL=
+
 AUTH_SECRET=
 
 GITHUB_CLIENT_ID=
+
 GITHUB_CLIENT_SECRET=
 
 GOOGLE_CLIENT_ID=
+
 GOOGLE_CLIENT_SECRET=
 
 RESEND_API_KEY=re_Lhw3LXbw_6oVLH2t8eQNA3rCXLtowTTCa
